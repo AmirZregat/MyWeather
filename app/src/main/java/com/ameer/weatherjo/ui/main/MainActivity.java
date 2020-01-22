@@ -1,16 +1,18 @@
-package com.ameer.weatherjo;
+package com.ameer.weatherjo.ui.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -25,7 +27,9 @@ import android.widget.Toast;
 
 import com.ameer.weatherjo.API.ApiClient;
 import com.ameer.weatherjo.API.ApiInterface;
+import com.ameer.weatherjo.R;
 import com.ameer.weatherjo.models.DarkSky;
+import com.ameer.weatherjo.ui.settings_activity;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -46,6 +50,8 @@ public class MainActivity extends AppCompatActivity {
     ImageView icon;
     SwipeRefreshLayout refreshLayout;
 
+    //ViewModel
+    DarkSkyViewModel darkSkyViewModel;
 
     String location;
     //boolean switchOnOROff;
@@ -65,6 +71,12 @@ public class MainActivity extends AppCompatActivity {
         icon = findViewById(R.id.icon);
         todayDate = findViewById(R.id.todayDate);
         refreshLayout = findViewById(R.id.swipeToRefresh);
+
+        //ViewModel
+        darkSkyViewModel= ViewModelProviders.of(this).get(DarkSkyViewModel.class);
+
+
+
 
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -106,6 +118,7 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+
     private void InternetPermission() {
         Dexter.withActivity(this)
                 .withPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -146,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
             double lat = locationGps.getLatitude();
             double longi = locationGps.getLongitude();
             location = lat + "," + longi;
+            // location="32.532155, 35.863619";
         } catch (SecurityException e) {
             Toast.makeText(getApplicationContext(), "Security Exception", Toast.LENGTH_SHORT).show();
         }
@@ -205,8 +219,66 @@ public class MainActivity extends AppCompatActivity {
         todayDate.setText(CurrentDate);
     }
 
+
+
+
     public void loadJson() {
-        ApiInterface apiInterface = ApiClient.getApiCliet().create(ApiInterface.class);
+        darkSkyViewModel.getWeather(location);
+
+        darkSkyViewModel.darkSkyMutableLiveData.observe(this, new Observer<DarkSky>() {
+            @Override
+            public void onChanged(DarkSky darkSky) {
+
+                int t = (int) (Math.ceil((darkSky.getCurrently().getTemperature() - 32) * 5 / 9));
+
+                temp.setText("" + t + "°");
+
+                int f = (int) (Math.ceil((darkSky.getCurrently().getApparentTemperature() - 32) * 5 / 9));
+                feelsLike.setText("" + f + "°");
+
+                summary.setText(darkSky.getCurrently().getSummary());
+                windSpeed.setText((int) (Math.ceil(darkSky.getCurrently().getWindSpeed() * 1.609344)) + " Km/h");
+                humidity.setText(darkSky.getCurrently().getHumidity() + "");
+
+
+                String i = darkSky.getCurrently().getIcon();
+                switch (i) {
+                    case "partly-cloudy-day":
+                        icon.setImageResource(R.drawable.partlycloudyday);
+                        break;
+                    case "rain":
+                        icon.setImageResource(R.drawable.rain);
+                        break;
+                    case "cloudy":
+                        icon.setImageResource(R.drawable.cloudy);
+                        break;
+                    case "clear-night":
+                        icon.setImageResource(R.drawable.clearnight);
+                        break;
+                    case "partly-cloudy-night":
+                        icon.setImageResource(R.drawable.partlycloudynight);
+                        break;
+                    case "clear-day":
+                        icon.setImageResource(R.drawable.clearday);
+                        break;
+                    case "fog":
+                        icon.setImageResource(R.drawable.fog);
+                        break;
+                    case "sleet":
+                        icon.setImageResource(R.drawable.sleet);
+                        break;
+                    case "snow":
+                        icon.setImageResource(R.drawable.snow);
+                        break;
+                    default:
+                        icon.setImageResource(R.drawable.weatherjo);
+                        break;
+                }
+
+            }
+        });
+
+        /*ApiInterface apiInterface = ApiClient.getApiClient().create(ApiInterface.class);
         Call<DarkSky> call;
         call = apiInterface.getDarkSky(location);
         call.enqueue(new Callback<DarkSky>() {
@@ -273,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
                 temp.setText(t.getMessage());
             }
         });
+        */
     }
 
     @Override

@@ -1,13 +1,13 @@
-package com.ameer.weatherjo;
+package com.ameer.weatherjo.ui;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.CompoundButton;
 import android.widget.Switch;
+
+import com.ameer.weatherjo.R;
+import com.ameer.weatherjo.ui.main.MainActivity;
 
 public class settings_activity extends AppCompatActivity {
 
