@@ -4,8 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
@@ -25,8 +23,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.ameer.weatherjo.API.ApiClient;
-import com.ameer.weatherjo.API.ApiInterface;
 import com.ameer.weatherjo.R;
 import com.ameer.weatherjo.models.DarkSky;
 import com.ameer.weatherjo.ui.settings_activity;
@@ -40,10 +36,6 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import java.text.DateFormat;
 import java.util.Calendar;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
 public class MainActivity extends AppCompatActivity {
 
     TextView temp, summary, windSpeed, humidity, feelsLike, todayDate;
@@ -54,15 +46,17 @@ public class MainActivity extends AppCompatActivity {
     DarkSkyViewModel darkSkyViewModel;
 
     String location;
-    //boolean switchOnOROff;
-
     LocationManager locationManager;
+
+    //loadingDialog
+    LoadingDialog loadingDialog=new LoadingDialog(MainActivity.this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        // loadDarkOrNot();
+
+        loadingDialog.startLoadingDialog();
 
         temp = findViewById(R.id.temp);
         summary = findViewById(R.id.summary);
@@ -215,6 +209,8 @@ public class MainActivity extends AppCompatActivity {
         darkSkyViewModel.darkSkyMutableLiveData.observe(this, new Observer<DarkSky>() {
             @Override
             public void onChanged(DarkSky darkSky) {
+
+                loadingDialog.dismissDialog();
 
                 int t = (int) (Math.ceil((darkSky.getCurrently().getTemperature() - 32) * 5 / 9));
 
