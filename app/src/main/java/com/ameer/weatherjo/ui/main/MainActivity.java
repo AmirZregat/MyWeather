@@ -63,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // loadDarkOrNot();
+
         temp = findViewById(R.id.temp);
         summary = findViewById(R.id.summary);
         windSpeed = findViewById(R.id.windSpeed);
@@ -73,10 +74,7 @@ public class MainActivity extends AppCompatActivity {
         refreshLayout = findViewById(R.id.swipeToRefresh);
 
         //ViewModel
-        darkSkyViewModel= ViewModelProviders.of(this).get(DarkSkyViewModel.class);
-
-
-
+        darkSkyViewModel = ViewModelProviders.of(this).get(DarkSkyViewModel.class);
 
 
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -91,15 +89,6 @@ public class MainActivity extends AppCompatActivity {
         setDate();
     }
 
-/*    private void loadDarkOrNot() {
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        switchOnOROff = sharedPreferences.getBoolean("DarkSwitch", false);
-        if(switchOnOROff){
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        }
-        else
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-    }*/
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -218,8 +207,6 @@ public class MainActivity extends AppCompatActivity {
         String CurrentDate = DateFormat.getDateInstance(DateFormat.FULL).format(calendar.getTime());
         todayDate.setText(CurrentDate);
     }
-
-
 
 
     public void loadJson() {

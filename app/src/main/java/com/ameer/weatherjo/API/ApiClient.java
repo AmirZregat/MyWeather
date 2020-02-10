@@ -1,5 +1,7 @@
 package com.ameer.weatherjo.API;
 
+import com.ameer.weatherjo.models.DarkSky;
+
 import java.security.cert.CertificateException;
 
 import javax.net.ssl.HostnameVerifier;
@@ -9,26 +11,28 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import io.reactivex.Observable;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiClient {
-    public static final String BASE_URL = "https://api.darksky.net/";
-
+  /*  public static final String BASE_URL = "https://api.darksky.net/";
     public static Retrofit retrofit;
-
     public static Retrofit getApiClient() {
 
         if (retrofit == null) {
             retrofit = new Retrofit.Builder().baseUrl(BASE_URL)
                     .client(getUnsafeOkHttpClient().build())
                     .addConverterFactory(GsonConverterFactory.create())
+                    .addCallAdapterFactory(RxJava2CallAdapterFactory.create())//add this for rxJava
                     .build();
         }
 
         return retrofit;
     }
+
 
     public static OkHttpClient.Builder getUnsafeOkHttpClient() {
         try {
@@ -69,6 +73,30 @@ public class ApiClient {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+*/
+
+  private static final String BASE_URL="https://api.darksky.net/";
+  private ApiInterface apiInterface;
+  private static ApiClient INSTANCE;
+  public ApiClient(){
+      Retrofit retrofit=new Retrofit.Builder()
+              .baseUrl(BASE_URL)
+              .addConverterFactory(GsonConverterFactory.create())
+              .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+              .build();
+      apiInterface=retrofit.create(ApiInterface.class);
+  }
+
+  public static ApiClient getInstance(){
+      if(null==INSTANCE){
+          INSTANCE=new ApiClient();
+      }
+      return INSTANCE;
+  }
+
+  public Observable<DarkSky>getWeather(String loc){
+      return apiInterface.getDarkSky(loc);
     }
 
 }
